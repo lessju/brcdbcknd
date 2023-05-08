@@ -26,6 +26,9 @@ def create_app(*args, **kwargs):
         # Since the user_id is the primary key, use it in the query for the user
         return User.query.get(int(user_id))
 
+    # Create database
+    with app.app_context():
+        db.create_all()
 
     # blueprint for auth routes in our app
     from backend.auth import auth as auth_blueprint
