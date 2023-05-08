@@ -10,13 +10,13 @@
 </head>
 
 <body>
-    <section class="hero is-primary is-fullheight">
-
+    <section class="hero is-link is-fullheight is-fullwidth">
         <div class="hero-head">
+
             <nav class="navbar">
-                <div class="container">
-                    <div id="navbarMenuHeroA" class="navbar-menu">
-                        <div class="navbar-end">
+<!--                <div class="container">-->
+                    <div class="navbar-menu is-active">
+                        <div class="navbar-start has-dropdown is-hoverable">
                             <a href="{{ url_for('main.index') }}" class="navbar-item">
                                 Home
                             </a>
@@ -25,21 +25,29 @@
                                 Profile
                             </a>
                             {% endif %}
+
+                            {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.login') }}" class="navbar-item">
                                 Login
                             </a>
+                            {% endif %}
+
+                            {% if not current_user.is_authenticated %}
                             <a href="{{ url_for('auth.signup') }}" class="navbar-item">
                                 Sign Up
                             </a>
+                            {% endif %}
+
                             {% if current_user.is_authenticated %}
                             <a href="{{ url_for('auth.logout') }}" class="navbar-item">
                                 Logout
                             </a>
                             {% endif %}
                         </div>
-                    </div>
+<!--                    </div>-->
                 </div>
             </nav>
+
         </div>
 
         <div class="hero-body">

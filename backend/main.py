@@ -2,7 +2,7 @@ from flask_login import login_required, current_user
 
 from backend.database.bin import Bin
 
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 main = Blueprint('main', __name__)
 
@@ -25,10 +25,17 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.name)
+    return render_template('index.html', name=current_user.name)
 
 
 # ---------- Backend functionality -----------
+
+@main.route("/scan_bin", methods=['POST'])
+def scan_bin():
+    qrcode = request.json['qrcode']
+    return {"valid": True}
+
+
 @main.route('/mark_bin_available/<bin_id>')
 def mark_bin_available(bin_id):
     if bin_id in bins.keys():

@@ -1,10 +1,34 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
-  Flask Login Example
-</h1>
-<h2 class="subtitle">
-  Easy authentication and authorization in Flask.
-</h2>
+
+<script src="{{url_for('static', filename='html5-qrcode.min.js')}}"></script>
+<script src="{{url_for('static', filename='html5-qrcode-demo.js')}}"></script>
+<script src="{{url_for('static', filename='bulma.js')}}"></script>
+
+{% if current_user.is_authenticated %}
+<div class="card is-centered" style="width: 550px">
+        <div class="card-header"><p class="card-header-title">Scan bin QR code to start recycling</p></div>
+        <div class="card-content">
+            <button class="button is-primary is-large" id="start-button" onclick="loadQrCodeReader()">Scan QR Code</button>
+            <div class="content is-centered" style="width: 500px" id="qr-reader"></div>
+        </div>
+</div>
+{% else %}
+<div class="card is-centered" style="width: 550px">
+        <div class="card-header"><p class="card-header-title">Login to scan bin</p></div>
+        <div class="card-content">
+            <button class="button is-primary is-large"  onclick="location.href=window.location.origin + '/profile'">Login</button>
+        </div>
+</div>
+{% endif %}
+
+<footer class="footer is-hidden">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>Hello</p>
+    </div>
+  </div>
+</footer>
+
 {% endblock %}
