@@ -1,24 +1,37 @@
 from flask_login import UserMixin
+from sqlalchemy.orm import backref
+
 from backend.app import db
 
 
 class User(UserMixin, db.Model):
     """ Class representing a user """
+    __tablename__ = "user_table"
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(100))
+    recycled_containers = db.Column(db.Integer, default=0)
     balance = db.Column(db.Float(), default=0)
 
 
 class RecyclingBin(db.Model):
     """ Class representing a recycling bin"""
+    __tablename__ = "bin_table"
+
     id = db.Column(db.Integer, primary_key=True)
     qrcode = db.Column(db.Integer, unique=True)
+    online = db.Column(db.Boolean, default=False)
+    available = db.Column(db.Boolean, default=False)
+    created_time = db.Column(db.DateTime, server_default=db.func.now())
+    modified_time = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.now())
 
 
-class Container(db.Model):
+class RecyclableContainer(db.Model):
     """ Class representing a recyclable container """
+    __tablename__ = "container_table"
+
     id = db.Column(db.Integer, primary_key=True)
     barcode = db.Column(db.String(100), unique=True)
 

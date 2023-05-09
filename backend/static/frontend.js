@@ -10,7 +10,7 @@ function docReady(fn) {
 
 
 async function processQrCode(qrcode) {
-    let valid = await fetch( window.location.origin + "/scan_bin", {
+    let json = await fetch( window.location.origin + "/scan_bin_qrcode", {
                 method: "POST",
                 body: JSON.stringify({
                     qrcode: `${qrcode}`,
@@ -20,39 +20,55 @@ async function processQrCode(qrcode) {
                 }
             }).then((response) => response.json())
                 .then(function(json){
-                    // Print result to screen
-                    return json.valid;
+                    return json;
                 });
 
-    // If the result is valid, clear QR code reader, show notification and redirect
-    console.log("Before");
-    if (valid) {
-        // Close the QR code scanning after result is found
+    // Display scan result
+    var valid = false;
+    if (!json.bin_online) {
+        // Invalid QR code or bin is offline
+        Bulma().alert({
+            type: 'danger',
+            title: 'Recycling bin offline',
+            body: 'The scanned QR code is invalid or the recycling bin is offline.',
+            confirm: 'OK'
+        });
+    }
+    else if (!json.bin_available)
+        // Bin online not available
+        Bulma().alert({
+            type: 'danger',
+            title: 'Recycling bin unavailable',
+            body: 'The scanned recycling bin is currently not available!',
+            confirm: 'OK'
+        });
+    else {
+        // Bin online and available
         Bulma().alert({
             type: 'success',
             title: 'QR Code Scanned',
             body: 'QR Code for bin 1234 successfully scanned, you may place containers in bin.',
             confirm: 'OK'
         });
+        valid = true;
     }
-    else {
-        // Otherwise, show invalid notification
-        Bulma().alert({
-            type: 'error',
-            title: 'QR Code',
-            body: 'The scanned QR code is invalid, please re-scan',
-            confirm: 'OK'
-        });
-    }
-    console.log("After 1");
 
     while (document.getElementsByClassName('modal-card').length !== 0) {
            await new Promise(r => setTimeout(r, 200));
     }
 
-    console.log("After 2");
-
     return valid;
+}
+
+// Square QR box with edge size = 90% of the smaller edge of the viewfinder.
+let qrboxSizeFunction = function(viewfinderWidth, viewfinderHeight) {
+    let minEdgePercentage = 0.9;
+    let minEdgeSize = Math.min(viewfinderWidth, viewfinderHeight);
+    let qrboxSize = Math.floor(minEdgeSize * minEdgePercentage);
+    return {
+        width: qrboxSize,
+        height: qrboxSize
+    };
 }
 
 function loadQrCodeReader() {
@@ -63,7 +79,7 @@ function loadQrCodeReader() {
 
     var html5QrcodeScanner = new Html5QrcodeScanner(
         "qr-reader", {
-            fps: 10, qrbox: 250, rememberLastUsedCamera: true,
+            fps: 10, rememberLastUsedCamera: true, qrbox: qrboxSizeFunction,
             showTorchButtonIfSupported: true
         });
     html5QrcodeScanner.render(onScanSuccess)

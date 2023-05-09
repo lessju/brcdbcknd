@@ -5,8 +5,24 @@ from flask_sqlalchemy import SQLAlchemy
 # init SQLAlchemy so we can use it later in our models
 db = SQLAlchemy()
 
+
+def load_barcodes_data(app):
+    # Load barcode database
+    from backend.models import RecyclableContainer
+
+    with app.app_context():
+        with open("backend/database/barcodes.txt") as f:
+            for line in f.readlines():
+                barcode, value = line.split(',')
+                if not RecyclableContainer.query.filter_by(barcode=barcode).first():
+                    new_container = RecyclableContainer(barcode=int(barcode), monetary_value=float(value))
+                    db.session.add(new_container)
+
+        db.session.commit()
+
+
 def create_app(*args, **kwargs):
-    global database_created
+    """ Create Flask application """
 
     app = Flask(__name__)
 
@@ -38,9 +54,13 @@ def create_app(*args, **kwargs):
     from backend.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    # Load static data
+    load_barcodes_data(app)
+
     return app
 
 
+# Create application instance
 application = create_app()
 
 
