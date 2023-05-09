@@ -7,13 +7,21 @@
 <script src="{{url_for('static', filename='frontend.js')}}"></script>
 
 {% if current_user.is_authenticated %}
-<div class="card is-centered" style="width: 100%">
+<div class="card is-centered" id="scan-card" style="width: 100%">
         <div class="card-header"><p class="card-header-title">Scan bin QR code to start recycling</p></div>
         <div class="card-content">
             <button class="button is-primary is-large" id="start-button" onclick="loadQrCodeReader()">Scan QR Code</button>
             <div class="content is-centered" style="width: 100%" id="qr-reader"></div>
         </div>
 </div>
+
+<div class="card is-centered"  id="stop-card" style="width: 100%; visibility:hidden">
+        <div class="card-header"><p class="card-header-title">Stop recycling session</p></div>
+        <div class="card-content">
+            <button class="button is-primary is-large" id="stop-button" onclick="stopSession()">Stop Session</button>
+        </div>
+</div>
+
 {% else %}
 <div class="card is-centered" style="width: 100%">
         <div class="card-header"><p class="card-header-title">Login to scan bin</p></div>

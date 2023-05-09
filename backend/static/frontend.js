@@ -60,6 +60,15 @@ async function processQrCode(qrcode) {
     return valid;
 }
 
+async function stopSessionOnBackend() {
+    let json = await fetch(window.location.origin + "/stop_session")
+                            .then((response) => {
+                                return response.json();
+                            })
+
+    return !!json.success;
+}
+
 // Square QR box with edge size = 90% of the smaller edge of the viewfinder.
 let qrboxSizeFunction = function(viewfinderWidth, viewfinderHeight) {
     let minEdgePercentage = 0.9;
@@ -94,14 +103,31 @@ function loadQrCodeReader() {
                     // Clear QR Code Scanner
                     html5QrcodeScanner.clear();
 
-                    // Navigate to container disposal page
-                    window.location.href = window.location.origin + "/profile"
+                    // Show top button
+                    document.getElementById('stop-card').style.visibility = 'visible';
+                    document.getElementById('scan-card').remove();
+
                 } else {
                     lastResult = null;
                 }
             });
         }
     }
+}
+
+function stopSession() {
+    // Call stop session on backend
+    stopSessionOnBackend().then(function (success) {
+        if (success) {
+            // Remove stop card
+            document.getElementById('stop-card').remove()
+
+            // Move to profile page
+             window.location.href = window.location.origin + "/profile"
+        }
+        else
+            console.log("Something went wrong");
+    });
 }
 
 document.querySelectorAll('.navbar-link').forEach(function(navbarLink){

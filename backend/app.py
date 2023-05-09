@@ -1,3 +1,6 @@
+import datetime
+
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -13,9 +16,11 @@ def load_barcodes_data(app):
     with app.app_context():
         with open("backend/database/barcodes.txt") as f:
             for line in f.readlines():
-                barcode, value = line.split(',')
+                barcode, label, weight, value = line.split(',')
                 if not RecyclableContainer.query.filter_by(barcode=barcode).first():
-                    new_container = RecyclableContainer(barcode=int(barcode), monetary_value=float(value))
+                    new_container = RecyclableContainer(barcode=int(barcode),
+                                                        label=label, weight=weight,
+                                                        monetary_value=float(value))
                     db.session.add(new_container)
 
         db.session.commit()
@@ -62,6 +67,32 @@ def create_app(*args, **kwargs):
 
 # Create application instance
 application = create_app()
+
+
+def update_bin_state():
+    """ Function called by scheduler that check the last modified time of recycling bins """
+
+    with application.app_context():
+        from backend.models import RecyclingBin
+
+        # Cycle through all the registered recycling bins
+        for recycling_bin in RecyclingBin.query.all():
+            # If bin is already marked as offline, continue
+            if not recycling_bin.online:
+                continue
+
+            # If the last modified date of the bin
+            if (datetime.datetime.utcnow() - recycling_bin.modified_time).seconds > 300:
+                recycling_bin.available = False
+                recycling_bin.online = False
+                db.session.commit()
+    return
+
+
+# Every minute update the status of recycling bins
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(update_bin_state, 'interval', minutes=1)
+sched.start()
 
 
 if __name__ == "__main__":

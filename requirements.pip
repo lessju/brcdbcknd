@@ -1,5 +1,5 @@
 flask
-gunicorn
 flask-sqlalchemy
 flask-login
 apscheduler
+gunicorn

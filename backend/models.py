@@ -1,5 +1,4 @@
 from flask_login import UserMixin
-from sqlalchemy.orm import backref
 
 from backend.app import db
 
@@ -34,6 +33,6 @@ class RecyclableContainer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     barcode = db.Column(db.String(100), unique=True)
-
-    # Monetary value gained when recycling container
+    label = db.Column(db.String(100), default="Container label")
+    weight = db.Column(db.Float(), default=100)
     monetary_value = db.Column(db.Float(), default=10)
