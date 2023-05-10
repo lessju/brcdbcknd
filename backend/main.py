@@ -76,7 +76,8 @@ def scan_bin_qrcode():
         return json.dumps(reply), 200, {'ContentType': 'application/json'}
 
     # If bin is already associated with a user, replace mapping (assume previous user has not stopped session)
-    if user_id := get_user_id_from_bin(recycling_bin.id) != -1:
+    user_id = get_user_id_from_bin(recycling_bin.id)
+    if user_id != -1:
         user_bin_association.pop(user_id)
 
     # User can use recycling bin. Associate user with bin
