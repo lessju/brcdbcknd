@@ -2,18 +2,42 @@
 
 {% block content %}
 
+<script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 <script src="{{url_for('static', filename='bulma.js')}}"></script>
 <script src="{{url_for('static', filename='html5-qrcode.min.js')}}"></script>
 <script src="{{url_for('static', filename='frontend.js')}}"></script>
 
 {% if current_user.is_authenticated %}
-<div class="card is-centered" id="scan-card" style="width: 100%">
-        <div class="card-header"><p class="card-header-title">Scan bin QR code to start recycling</p></div>
+<!--    {% if False %}-->
+    <div class="card is-centered" id="scan-card" style="width: 100%">
+            <div class="card-header"><p class="card-header-title">Scan QR code to start recycling</p></div>
+            <div class="card-content">
+                <button class="button is-primary is-large" id="start-button" onclick="loadQrCodeReader()">Scan QR Code</button>
+                <div class="content is-centered" style="width: 100%" id="qr-reader"></div>
+            </div>
+    </div>
+<!--    {% else %}-->
+    <div class="card is-centered" id="qr-code" style="width: 100%">
+            <div class="card-header"><p class="card-header-title">Scan QR Code to start recycling</p></div>
         <div class="card-content">
-            <button class="button is-primary is-large" id="start-button" onclick="loadQrCodeReader()">Scan QR Code</button>
-            <div class="content is-centered" style="width: 100%" id="qr-reader"></div>
+            <div id="qrwrap">
+                <div id="qrcode" >
+                    <script type="text/javascript">
+                        // new QRCode(document.getElementById("qrcode"), "{{ current_user.id }}" );
+                        var qrcode = new QRCode(document.getElementById("qrcode"), {
+            text: "https://webisora.com",
+            width: 128,
+            height: 128,
+            colorDark : "#5868bf",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+                    </script>
+                </div>
+            </div>
         </div>
-</div>
+    </div>
+<!--    {% endif %}-->
 
 <div class="card is-centered"  id="stop-card" style="width: 100%; visibility:hidden">
         <div class="card-header"><p class="card-header-title">Stop recycling session</p></div>

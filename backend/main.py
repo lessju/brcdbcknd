@@ -33,7 +33,7 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.balance)
+    return render_template('profile.html', balance=f"€{current_user.balance:.2f}")
 
 
 # ---------- User Backend functionality -----------
