@@ -162,6 +162,19 @@ def check_user_request():
     return json.dumps({'requested': True}), 200, {'ContentType': 'application/json'}
 
 
+@main.route("/confirm_user", methods=['POST'])
+def confirm_user():
+    """ Check whether scanned barcode is a valid user """
+    user_id = request.json['user_id']
+
+    # Check whether user exists
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
+
+    return reply_200
+
+
 @main.route("/verify_barcode/", methods=['POST'])
 def verify_barcode():
     """ A recycling container has scanned a barcode """
@@ -177,8 +190,8 @@ def verify_barcode():
     return reply_200
 
 
-@main.route("/confirm_barcode/", methods=['POST'])
-def confirm_barcode():
+@main.route("/confirm_barcode_from_bin/", methods=['POST'])
+def confirm_barcode_from_bin():
     # Get post body contents
     bin_id = request.json['bin_id']
     barcode = request.json['barcode']
@@ -198,6 +211,25 @@ def confirm_barcode():
         user.recycled_containers = User.recycled_containers + 1
         user.balance = User.balance + container.monetary_value
         db.session.commit()
+
+    # Return success
+    return reply_200
+
+
+@main.route("/confirm_barcode/", methods=['POST'])
+def confirm_barcode():
+    # Get post body contents
+    user_id = request.json['user_id']
+    barcode = request.json['barcode']
+
+    # Get container
+    container = RecyclableContainer.query.filter_by(barcode=barcode).first()
+
+    # Provide compensation to user
+    user = User.query.filter_by(id=user_id).first()
+    user.recycled_containers = User.recycled_containers + 1
+    user.balance = User.balance + container.monetary_value
+    db.session.commit()
 
     # Return success
     return reply_200

@@ -1,3 +1,5 @@
+import uuid
+
 from flask_login import UserMixin
 
 from backend.app import db
@@ -7,7 +9,7 @@ class User(UserMixin, db.Model):
     """ Class representing a user """
     __tablename__ = "user_table"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, default=lambda: uuid.uuid4().int >> (128 - 32), primary_key=True)
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(100))
