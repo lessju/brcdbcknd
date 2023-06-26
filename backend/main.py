@@ -47,6 +47,7 @@ def stop_session():
     recycling_bin = user_bin_association[current_user.id]
     recycling_bin = RecyclingBin.query.filter_by(id=recycling_bin).first()
     recycling_bin.available = True
+    del user_bin_association[current_user.id]
     db.session.commit()
 
     return reply_200
@@ -187,7 +188,7 @@ def verify_barcode():
         return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
 
     # Otherwise, return success and the container's weight
-    return json.dumps({'success': False, 'weight': container.weight}), 200, {'ContentType': 'application/json'}
+    return json.dumps({'success': True, 'weight': container.weight}), 200, {'ContentType': 'application/json'}
 
 
 @main.route("/confirm_barcode_from_bin/", methods=['POST'])
