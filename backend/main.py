@@ -186,8 +186,8 @@ def verify_barcode():
     if not container:
         return json.dumps({'success': False}), 200, {'ContentType': 'application/json'}
 
-    # Return success
-    return reply_200
+    # Otherwise, return success and the container's weight
+    return json.dumps({'success': False, 'weight': container.weight}), 200, {'ContentType': 'application/json'}
 
 
 @main.route("/confirm_barcode_from_bin/", methods=['POST'])
