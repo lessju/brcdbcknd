@@ -47,7 +47,7 @@ async function processQrCode(qrcode) {
         Bulma().alert({
             type: 'success',
             title: 'QR Code Scanned',
-            body: 'QR Code for bin 1234 successfully scanned, you may place containers in bin.',
+            body: 'QR Code scanned, you may place containers in bin.',
             confirm: 'OK'
         });
         valid = true;
