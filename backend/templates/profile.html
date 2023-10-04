@@ -2,6 +2,30 @@
 
 {% block content %}
 <h1 class="title">
-  Current Balance: {{balance}}
+  Current Balance: €{{balance}}
 </h1>
+
+{% if balance > 0 %}
+  <section class="section">
+    <div class="columns is-centered">
+    <div class="column is-narrow">
+  <table class="table is-striped">
+    <thead>
+    <tr>
+      <th>Time</th>
+      <th>Bottle</th>
+    </tr>
+    </thead>
+    <tbody>
+  {% for timestamp, container in recycled_containers %}
+    <tr>
+      <td>{{timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{container}}</td>
+    </tr>
+  {% endfor %}
+    </tbody>
+  </table>
+    </div></div></section>
+{% endif %}
+
 {% endblock %}

@@ -17,6 +17,14 @@ class User(UserMixin, db.Model):
     balance = db.Column(db.Float(), default=0)
 
 
+class RecycledContainer(db.Model):
+    """ Class representing a recycled container """
+    id = db.Column(db.Integer, primary_key=True)
+    container_id = db.Column(db.Integer, unique=False)
+    user_id = db.Column(db.Integer, unique=False)
+    timestamp = db.Column(db.DateTime, server_default=db.func.now())
+
+
 class RecyclingBin(db.Model):
     """ Class representing a recycling bin"""
     __tablename__ = "bin_table"

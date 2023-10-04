@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request
 from flask_login import login_required, current_user
 
 from backend.app import db
-from backend.models import RecyclingBin, RecyclableContainer, User
+from backend.models import RecyclingBin, RecyclableContainer, User, RecycledContainer
 
 main = Blueprint('main', __name__)
 
@@ -33,10 +33,24 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', balance=f"€{current_user.balance:.2f}")
+    """ Generate the profile page """
+    # Get list of recycled containers
+    user = User.query.filter_by(id=current_user.id).first()
 
+    # Get list of recycled containers with associated timestamps
+    containers = RecycledContainer.query.filter_by(user_id=current_user.id).all()
+    print(containers)
+    recycled_containers = []
+    for row in containers:
+        cnt = RecyclableContainer.query.filter_by(id=row.container_id).first()
+        recycled_containers.append((row.timestamp, cnt.label))
+
+    return render_template('profile.html',
+                           balance=user.balance,
+                           recycled_containers=recycled_containers)
 
 # ---------- User Backend functionality -----------
+
 
 @main.route("/stop_session")
 @login_required
@@ -226,10 +240,18 @@ def confirm_barcode():
     # Get container
     container = RecyclableContainer.query.filter_by(barcode=barcode).first()
 
-    # Provide compensation to user
+    # Get user
     user = User.query.filter_by(id=user_id).first()
+
+    # Keep record of recycled containers
+    recycled_container = RecycledContainer(user_id=user.id, container_id=container.id)
+    db.session.add(recycled_container)
+
+    # Provide compensation to user
     user.recycled_containers = User.recycled_containers + 1
     user.balance = User.balance + container.monetary_value
+
+    # Commit changes to database
     db.session.commit()
 
     # Return success
