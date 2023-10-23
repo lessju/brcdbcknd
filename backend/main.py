@@ -39,15 +39,30 @@ def profile():
 
     # Get list of recycled containers with associated timestamps
     containers = RecycledContainer.query.filter_by(user_id=current_user.id).all()
-    print(containers)
     recycled_containers = []
     for row in containers:
         cnt = RecyclableContainer.query.filter_by(id=row.container_id).first()
         recycled_containers.append((row.timestamp, cnt.label))
 
     return render_template('profile.html',
-                           balance=user.balance,
+                           balance=round(user.balance, 2),
                            recycled_containers=recycled_containers)
+
+
+@main.route("/clear_history")
+@login_required
+def clear_history():
+    # Get list of recycled containers
+    user = User.query.filter_by(id=current_user.id).first()
+
+    # Get list of recycled containers
+    RecycledContainer.query.filter_by(user_id=current_user.id).delete()
+
+    # Commit changes
+    db.session.commit()
+
+    # Re-render profile page
+    return profile()
 
 # ---------- User Backend functionality -----------
 
