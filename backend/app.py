@@ -26,6 +26,23 @@ def load_barcodes_data(app):
         db.session.commit()
 
 
+def load_users(app):
+    # Load users
+    from backend.models import User
+
+    with app.app_context():
+        with open("backend/database/users.txt") as f:
+            for line in f.readlines():
+                name, email, password, id = line.split(',')
+                if not User.query.filter_by(email=email).first():
+                    new_user = User(id=id,
+                                    email=email,
+                                    name=name,
+                                    password=password)
+                    db.session.add(new_user)
+        db.session.commit()
+
+
 def create_app(*args, **kwargs):
     """ Create Flask application """
 
@@ -61,6 +78,7 @@ def create_app(*args, **kwargs):
 
     # Load static data
     load_barcodes_data(app)
+    load_users(app)
 
     return app
 

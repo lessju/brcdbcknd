@@ -15,6 +15,8 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(100))
     recycled_containers = db.Column(db.Integer, default=0)
     balance = db.Column(db.Float(), default=0)
+    session_start_time = db.Column(db.DateTime, unique=False, server_default=db.func.now())
+    session_end_time = db.Column(db.DateTime, unique=False, server_default=db.func.now())
 
 
 class RecycledContainer(db.Model):
@@ -22,7 +24,8 @@ class RecycledContainer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     container_id = db.Column(db.Integer, unique=False)
     user_id = db.Column(db.Integer, unique=False)
-    timestamp = db.Column(db.DateTime, server_default=db.func.now())
+    accepted = db.Column(db.Boolean, default=True)
+    timestamp = db.Column(db.DateTime, unique=False)
 
 
 class RecyclingBin(db.Model):
