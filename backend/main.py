@@ -234,17 +234,10 @@ def get_session_bottles():
     for row in containers:
         cnt = RecyclableContainer.query.filter_by(id=row.container_id).first()
         if cnt is None:
-            item = {'timestamp': row.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                    'label': row.container_id,
-                    'value': 0,
-                    'accepted': row.accepted}
+            item = (row.timestamp.strftime("%Y-%m-%d %H:%M:%S"), row.container_id, 0, row.accepted)
         else:
-            item = {'timestamp': row.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                    'label': cnt.label,
-                    'value': cnt.monetary_value,
-                    'accepted': row.accepted}
+            item = (row.timestamp.strftime("%Y-%m-%d %H:%M:%S"), cnt.label, cnt.monetary_value, row.accepted)
         recycled_containers.append(item)
-    print(recycled_containers)
 
     return json.dumps({'success': True,
                        'session_ended': session_ended,
