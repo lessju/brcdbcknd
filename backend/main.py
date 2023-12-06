@@ -64,6 +64,7 @@ def clear_history():
     # Re-render profile page
     return profile()
 
+
 # ---------- User Backend functionality -----------
 
 
@@ -175,7 +176,8 @@ def confirm_barcode():
     user = User.query.filter_by(id=user_id).first()
 
     # Keep record of recycled containers
-    recycled_container = RecycledContainer(user_id=user.id, container_id=container.id, timestamp=datetime.datetime.now())
+    recycled_container = RecycledContainer(user_id=user.id, container_id=container.id,
+                                           timestamp=datetime.datetime.now())
     db.session.add(recycled_container)
 
     # Provide compensation to user
@@ -209,7 +211,7 @@ def reject_barcode():
     return reply_200
 
 
-@main.route("/get_session_bottles", methods=['POST'])
+@main.route("/get_session_info", methods=['POST'])
 def get_session_bottles():
     # Get post body contents
     user_id = request.json['user_id']
@@ -218,8 +220,10 @@ def get_session_bottles():
     user = User.query.filter_by(id=user_id).first()
 
     end_time = datetime.datetime.now()
-    if user.session_end_time < user.session_start_time:
+    session_ended = False
+    if user.session_end_time > user.session_start_time:
         end_time = user.session_end_time
+        session_ended = True
     print("Between", user.session_start_time, end_time)
 
     # Get list of recycled containers with associated timestamps
@@ -230,10 +234,18 @@ def get_session_bottles():
     for row in containers:
         cnt = RecyclableContainer.query.filter_by(id=row.container_id).first()
         if cnt is None:
-            recycled_containers.append(
-                (row.timestamp.strftime("%Y-%m-%d %H:%M:%S"), row.container_id, 0, row.accepted))
+            item = {'timestamp': row.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                    'label': row.container_id,
+                    'value': 0,
+                    'accepted': row.accepted}
         else:
-            recycled_containers.append((row.timestamp.strftime("%Y-%m-%d %H:%M:%S"), cnt.label, cnt.monetary_value, row.accepted))
+            item = {'timestamp': row.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                    'label': cnt.label,
+                    'value': cnt.monetary_value,
+                    'accepted': row.accepted}
+        recycled_containers.append(item)
     print(recycled_containers)
 
-    return json.dumps({'success': True, 'bottles': recycled_containers}), 200, {'ContentType': 'application/json'}
+    return json.dumps({'success': True,
+                       'session_ended': session_ended,
+                       'bottles': recycled_containers}), 200, {'ContentType': 'application/json'}

@@ -6,7 +6,7 @@ keepalive_endpoint = "bin_keepalive"
 confirm_user_endpoint = "confirm_user"
 verify_barcode_endpoint = "verify_barcode"
 confirm_barcode_endpoint = "confirm_barcode"
-get_session_bottles_endpoint = "get_session_bottles"
+get_session_info_endpoint = "get_session_info"
 reject_barcode_endpoint = "reject_barcode"
 end_user_session_endpoint = "end_user_session"
 
@@ -32,8 +32,9 @@ def send_request(endpoint, values=None):
 check_backend_online()
 print(send_request(confirm_user_endpoint, {'user_id': 12345678}))
 print(send_request(confirm_barcode_endpoint, {'user_id': 12345678, 'barcode': 54491496}))
+print(send_request(get_session_info_endpoint, {'user_id': 12345678}))
 print(send_request(confirm_barcode_endpoint, {'user_id': 12345678, 'barcode': 54491496}))
 print(send_request(confirm_barcode_endpoint, {'user_id': 12345678, 'barcode': 54491496}))
 print(send_request(reject_barcode_endpoint, {'user_id': 12345678, 'barcode': 54491496888}))
 print(send_request(end_user_session_endpoint, {'user_id': 12345678}))
-print(send_request(get_session_bottles_endpoint, {'user_id': 12345678}))
+print(send_request(get_session_info_endpoint, {'user_id': 12345678}))
